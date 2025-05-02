@@ -1,0 +1,49 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Simple Email Service 1.0.0\n"
+"Report-Msgid-Bugs-To: https://kobaltdigital.nl\n"
+"POT-Creation-Date: 2024-06-07 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: AI Cursor\n"
+"Language-Team: Kobalt Digital <info@kobaltdigital.nl>\n"
+"Last-Translator: Kobalt Digital <info@kobaltdigital.nl>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: simple-email-service.php:... (add line numbers as needed)
+msgid "Send Test Email"
+msgstr ""
+
+msgid "Test Email Address"
+msgstr ""
+
+msgid "API Key"
+msgstr ""
+
+msgid "From Email Address"
+msgstr ""
+
+msgid "From Name"
+msgstr ""
+
+msgid "Test email sent successfully! Check your inbox."
+msgstr ""
+
+msgid "Failed to send test email. Check error logs."
+msgstr ""
+
+msgid "Simple Email Service Settings"
+msgstr ""
+
+msgid "Simple Email Service"
+msgstr ""
+
+msgid "Warning: The domain of the \"From Email Address\" does not match the domain of this site. This may cause deliverability issues or your emails may be marked as spam."
+msgstr ""
+
+msgid "No mails can be sent if the domain of the \"From Email Address\" is different from the site domain."
+msgstr ""
+
+msgid "Settings"
+msgstr ""
