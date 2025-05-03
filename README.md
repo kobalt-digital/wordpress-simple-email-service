@@ -1,5 +1,4 @@
 # Simple Email Service
-
 Send WordPress emails through the [Simple Email Service API](https://api.simplemailservice.eu/). This plugin integrates with the [Simple Email Service](https://hosting.nl/products/simple-email-service/) by Hosting.NL, a Dutch email service provider that offers a scalable, privacy-friendly solution for sending transactional emails. The service supports both SMTP and REST API, ensuring reliable and efficient email delivery.
 
 ## Features
@@ -52,7 +51,21 @@ If the `--to` flag is omitted, the admin email will be used.
 
 ## License
 
-GPL v2 or later. See [LICENSE](https://www.gnu.org/licenses/gpl-2.0.html) for details.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+For more information, see [LICENSE](https://www.gnu.org/licenses/gpl-2.0.html).
 
 ## Author
 

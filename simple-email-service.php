@@ -6,9 +6,10 @@
  * Version: 1.0.0
  * Author: Arne van Hoorn - Kobalt Digital
  * Author URI: https://kobaltdigital.nl
- * License: GPL v2 or later
+ * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: simple-email-service
+ * Send WordPress emails through the Simple Email Service API by Hosting.NL
  */
 
 declare(strict_types=1);

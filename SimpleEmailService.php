@@ -8,15 +8,15 @@ class SimpleEmailService
     private string $api_url = 'https://api.simplemailservice.eu/v1/email/send';
     private string $plugin_basename;
 
-    public function __construct($plugin_file = null)
+    public function __construct($pluginFile = null)
     {
         if (!defined('ABSPATH')) {
             exit;
         }
 
         $this->api_key = get_option('ses_api_key', '');
-        $this->plugin_basename = $plugin_file
-            ? plugin_basename($plugin_file)
+        $this->plugin_basename = $pluginFile
+            ? plugin_basename($pluginFile)
             : plugin_basename(__FILE__);
 
         // Hook into WordPress email system
@@ -57,8 +57,8 @@ class SimpleEmailService
         $headers = $atts['headers'];
 
         // Parse headers
-        $from_email = get_option('ses_from_email', get_option('admin_email'));
-        $from_name = get_option('ses_from_name', get_bloginfo('name'));
+        $fromEmail = get_option('ses_from_email', get_option('admin_email'));
+        $fromName = get_option('ses_from_name', get_bloginfo('name'));
 
         if (!empty($headers) && is_string($headers)) {
             $headers = explode("\n", str_replace("\r\n", "\n", $headers));
@@ -69,16 +69,15 @@ class SimpleEmailService
                 if (strpos($header, 'From:') !== 0) {
                     continue;
                 }
-                $from = str_replace('From:', '', $header);
-                $from = trim($from);
+                $from = trim(str_replace('From:', '', $header));
 
                 // Extract name and email
                 if (preg_match('/(.*?)<(.+)>/', $from, $matches)) {
-                    $from_name = trim($matches[1]);
-                    $from_email = trim($matches[2]);
+                    $fromName = trim($matches[1]);
+                    $fromEmail = trim($matches[2]);
                     break;
                 }
-                $from_email = $from;
+                $fromEmail = $from;
                 break;
             }
         }
@@ -96,8 +95,8 @@ class SimpleEmailService
         // Prepare email payload
         $email = [
             'from' => [
-                'name' => $from_name,
-                'email' => $from_email
+                'name' => $fromName,
+                'email' => $fromEmail
             ],
             'recipients' => $recipients,
             'content' => [
@@ -152,7 +151,7 @@ class SimpleEmailService
 
     public function handleWpMailFailed($error)
     {
-        $error_message = sprintf(
+        $errorMessage = sprintf(
             /* translators: %s: Error message from WordPress mail function */
             __('Simple Email Service: Mail error: %s', 'simple-email-service'),
             $error->get_error_message()
@@ -160,7 +159,7 @@ class SimpleEmailService
 
         // Only log in development environment
         if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
-            error_log($error_message);
+            error_log($errorMessage);
         }
     }
 
@@ -247,8 +246,8 @@ class SimpleEmailService
 
             $this->sendTestEmail();
         }
-        $from_email = get_option('ses_from_email', get_option('admin_email'));
-        $show_domain_warning = !$this->isFromEmailDomainValid($from_email);
+        $fromEmail = get_option('ses_from_email', get_option('admin_email'));
+        $show_domain_warning = !$this->isFromEmailDomainValid($fromEmail);
         ?>
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
@@ -413,11 +412,11 @@ class SimpleEmailService
         }
     }
 
-    private function isFromEmailDomainValid($from_email): bool
+    private function isFromEmailDomainValid($fromEmail): bool
     {
         $site_url = get_site_url();
         $site_domain = preg_replace('/^www\./', '', wp_parse_url($site_url, PHP_URL_HOST));
-        $from_domain = substr(strrchr($from_email, '@'), 1);
+        $from_domain = substr(strrchr($fromEmail, '@'), 1);
         $from_domain = preg_replace('/^www\./', '', $from_domain);
         $from_domain = strtolower($from_domain);
         $site_domain = strtolower($site_domain);
