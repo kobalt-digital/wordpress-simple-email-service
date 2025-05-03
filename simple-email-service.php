@@ -19,5 +19,4 @@ if (!defined('ABSPATH')) {
 
 require_once __DIR__ . '/SimpleEmailService.php';
 
-// Initialize the plugin
-new Simple_Email_Service(__FILE__);
+new SimpleEmailService(__FILE__);

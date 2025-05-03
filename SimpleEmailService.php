@@ -2,50 +2,50 @@
 
 declare(strict_types=1);
 
-if (!defined('ABSPATH')) {
-    exit;
-}
-
-class Simple_Email_Service
+class SimpleEmailService
 {
     private string $api_key;
     private string $api_url = 'https://api.simplemailservice.eu/v1/email/send';
-    private const TEXT_DOMAIN = 'simple-email-service';
     private string $plugin_basename;
 
     public function __construct($plugin_file = null)
     {
+        if (!defined('ABSPATH')) {
+            exit;
+        }
+
         $this->api_key = get_option('ses_api_key', '');
-        $this->plugin_basename = $plugin_file ? plugin_basename($plugin_file) : plugin_basename(__FILE__);
+        $this->plugin_basename = $plugin_file
+            ? plugin_basename($plugin_file)
+            : plugin_basename(__FILE__);
 
         // Hook into WordPress email system
-        add_action('phpmailer_init', [$this, 'disable_phpmailer']);
-        add_action('wp_mail_failed', [$this, 'handle_wp_mail_failed']);
-        add_filter('pre_wp_mail', [$this, 'send_email'], 10, 2);
+        add_action('phpmailer_init', [$this, 'disablePhpmailer']);
+        add_action('wp_mail_failed', [$this, 'handleWpMailFailed']);
+        add_filter('pre_wp_mail', [$this, 'sendEmail'], 10, 2);
 
         // Admin hooks
-        add_action('admin_menu', [$this, 'add_admin_menu']);
-        add_action('admin_init', [$this, 'register_settings']);
+        add_action('admin_menu', [$this, 'addAdminMenu']);
+        add_action('admin_init', [$this, 'registerSettings']);
 
         // Plugin action links
-        $this->add_plugin_action_links_filter();
+        $this->addPluginActionLinksFilter();
 
         // WP-CLI command
         if (defined('WP_CLI') && WP_CLI) {
-            WP_CLI::add_command('ses test', [$this, 'wp_cli_test_email']);
+            WP_CLI::add_command('ses test', [$this, 'wpCliTestEmail']);
         }
     }
 
-    public function disable_phpmailer($phpmailer)
+    public function disablePhpmailer($phpmailer)
     {
-        // Disable default PHPMailer
         $phpmailer->Mailer = 'smtp';
         $phpmailer->Host = 'localhost';
         $phpmailer->SMTPAuth = false;
         $phpmailer->Port = 1025;
     }
 
-    public function send_email($pre_wp_mail, $atts)
+    public function sendEmail($pre_wp_mail, $atts)
     {
         if (empty($this->api_key)) {
             return false;
@@ -127,66 +127,164 @@ class Simple_Email_Service
             );
 
             if ($response === false) {
-                error_log(__('Simple Email Service: Failed to send email', self::TEXT_DOMAIN));
+                $error = new WP_Error(
+                    'ses_send_failed',
+                    __('Simple Email Service: Failed to send email', 'simple-email-service')
+                );
+                do_action('wp_mail_failed', $error);
                 return false;
             }
 
             return true;
         } catch (Exception $e) {
-            error_log(sprintf(__('Simple Email Service: %s', self::TEXT_DOMAIN), $e->getMessage()));
+            $error = new WP_Error(
+                'ses_exception',
+                sprintf(
+                    /* translators: %s: Error message from the Simple Email Service API */
+                    __('Simple Email Service: %s', 'simple-email-service'),
+                    $e->getMessage()
+                )
+            );
+            do_action('wp_mail_failed', $error);
             return false;
         }
     }
 
-    public function handle_wp_mail_failed($error)
+    public function handleWpMailFailed($error)
     {
-        error_log(sprintf(__('Simple Email Service: Mail error: %s', self::TEXT_DOMAIN), $error->get_error_message()));
+        $error_message = sprintf(
+            /* translators: %s: Error message from WordPress mail function */
+            __('Simple Email Service: Mail error: %s', 'simple-email-service'),
+            $error->get_error_message()
+        );
+
+        // Only log in development environment
+        if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+            error_log($error_message);
+        }
     }
 
-    public function add_admin_menu()
+    public function addAdminMenu()
     {
         add_options_page(
-            __('Simple Email Service Settings', self::TEXT_DOMAIN),
-            __('Simple Email Service', self::TEXT_DOMAIN),
+            __('Simple Email Service Settings', 'simple-email-service'),
+            __('Simple Email Service', 'simple-email-service'),
             'manage_options',
             'simple-email-service',
-            [$this, 'render_settings_page']
+            [$this, 'renderSettingsPage']
         );
     }
 
-    public function register_settings()
+    public function registerSettings()
     {
-        register_setting('simple_email_service', 'ses_api_key');
-        register_setting('simple_email_service', 'ses_from_email');
-        register_setting('simple_email_service', 'ses_from_name');
+        register_setting(
+            'simple_email_service',
+            'ses_api_key',
+            [$this, 'sanitizeApiKey']
+        );
+        register_setting(
+            'simple_email_service',
+            'ses_from_email',
+            [$this, 'sanitizeEmail']
+        );
+        register_setting(
+            'simple_email_service',
+            'ses_from_name',
+            [$this, 'sanitizeText']
+        );
     }
 
-    public function render_settings_page()
+    /**
+     * Sanitize API key
+     *
+     * @param string $value The API key to sanitize
+     * @return string Sanitized API key
+     */
+    public function sanitizeApiKey($value): string
+    {
+        return sanitize_text_field($value);
+    }
+
+    /**
+     * Sanitize email address
+     *
+     * @param string $value The email address to sanitize
+     * @return string Sanitized email address
+     */
+    public function sanitizeEmail($value): string
+    {
+        $sanitized = sanitize_email($value);
+        if (!is_email($sanitized)) {
+            add_settings_error(
+                'ses_from_email',
+                'invalid_email',
+                __('Please enter a valid email address.', 'simple-email-service')
+            );
+            return get_option('ses_from_email', get_option('admin_email'));
+        }
+        return $sanitized;
+    }
+
+    /**
+     * Sanitize text input
+     *
+     * @param string $value The text to sanitize
+     * @return string Sanitized text
+     */
+    public function sanitizeText($value): string
+    {
+        return sanitize_text_field($value);
+    }
+
+    public function renderSettingsPage()
     {
         if (isset($_POST['ses_test_email'])) {
-            $this->send_test_email();
+            // Verify nonce
+            $nonce = isset($_POST['ses_test_email_nonce']) ? sanitize_key($_POST['ses_test_email_nonce']) : '';
+            if (!wp_verify_nonce($nonce, 'ses_test_email')) {
+                wp_die(esc_html__('Security check failed', 'simple-email-service'));
+            }
+
+            $this->sendTestEmail();
         }
         $from_email = get_option('ses_from_email', get_option('admin_email'));
-        $show_domain_warning = !$this->is_from_email_domain_valid($from_email);
+        $show_domain_warning = !$this->isFromEmailDomainValid($from_email);
         ?>
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
+            <style>
+                .regular-text.error {
+                    border-color: #dc3232;
+                    box-shadow: 0 0 2px rgba(220, 50, 50, 0.8);
+                }
+            </style>
+
             <?php settings_errors('simple_email_service'); ?>
 
-            <?php if ($show_domain_warning): ?>
-                <div class="notice notice-warning">
-                    <p><?php _e('No mails can be sent if the domain of the "From Email Address" is different from the site domain.', self::TEXT_DOMAIN); ?></p>
+            <?php if ($show_domain_warning) { ?>
+                <div class="notice notice-error">
+                    <p>
+                        <?php
+                            esc_html_e(
+                                'No mails can be sent if the domain of the "From Email Address" is different from the site domain.',
+                                'simple-email-service'
+                            );
+                        ?>
+                    </p>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
 
             <!-- Test Email Form -->
             <form method="post" action="">
-                <h2><?php _e('Send Test Email', self::TEXT_DOMAIN); ?></h2>
+                <?php wp_nonce_field('ses_test_email', 'ses_test_email_nonce'); ?>
+                <h2><?php esc_html_e('Send Test Email', 'simple-email-service'); ?></h2>
                 <table class="form-table">
                     <tr>
                         <th scope="row">
-                            <label for="test_email"><?php _e('Test Email Address', self::TEXT_DOMAIN); ?></label>
+                            <label for="test_email">
+                                <?php esc_html_e('Test Email Address', 'simple-email-service'); ?>
+                            </label>
                         </th>
                         <td>
                             <input type="email"
@@ -209,7 +307,7 @@ class Simple_Email_Service
                 <table class="form-table">
                     <tr>
                         <th scope="row">
-                            <label for="ses_api_key"><?php _e('API Key', self::TEXT_DOMAIN); ?></label>
+                            <label for="ses_api_key"><?php esc_html_e('API Key', 'simple-email-service'); ?></label>
                         </th>
                         <td>
                             <input type="text"
@@ -221,19 +319,21 @@ class Simple_Email_Service
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="ses_from_email"><?php _e('From Email Address', self::TEXT_DOMAIN); ?></label>
+                            <label for="ses_from_email">
+                                <?php esc_html_e('From Email Address', 'simple-email-service'); ?>
+                            </label>
                         </th>
                         <td>
                             <input type="email"
                                    id="ses_from_email"
                                    name="ses_from_email"
                                    value="<?php echo esc_attr(get_option('ses_from_email', get_option('admin_email'))); ?>"
-                                   class="regular-text">
+                                   class="regular-text <?php echo $show_domain_warning ? 'error' : ''; ?>">
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="ses_from_name"><?php _e('From Name', self::TEXT_DOMAIN); ?></label>
+                            <label for="ses_from_name"><?php esc_html_e('From Name', 'simple-email-service'); ?></label>
                         </th>
                         <td>
                             <input type="text"
@@ -250,13 +350,24 @@ class Simple_Email_Service
         <?php
     }
 
-    private function send_test_email()
+    private function sendTestEmail()
     {
-        $test_email = isset($_POST['test_email']) ? sanitize_email($_POST['test_email']) : get_option('admin_email');
+        // Verify nonce
+        if (
+            !isset($_POST['ses_test_email_nonce'])
+            || !wp_verify_nonce(sanitize_key($_POST['ses_test_email_nonce']), 'ses_test_email')
+            ) {
+            wp_die(esc_html__('Security check failed', 'simple-email-service'));
+        }
+
+        $test_email = isset($_POST['test_email'])
+            ? sanitize_email(wp_unslash($_POST['test_email']))
+            : get_option('admin_email');
 
         $to = $test_email;
         $subject = 'Test Email from Simple Email Service';
-        $message = '<h1>This is a test email</h1><p>If you receive this, the Simple Email Service plugin is working correctly!</p>';
+        $message = '<h1>This is a test email</h1><p>
+            If you receive this, the Simple Email Service plugin is working correctly!</p>';
         $headers = ['Content-Type: text/html; charset=UTF-8'];
 
         $result = wp_mail($to, $subject, $message, $headers);
@@ -265,14 +376,14 @@ class Simple_Email_Service
             add_settings_error(
                 'simple_email_service',
                 'ses_test_success',
-                __('Test email sent successfully! Check your inbox.', self::TEXT_DOMAIN),
+                __('Test email sent successfully! Check your inbox.', 'simple-email-service'),
                 'success'
             );
         } else {
             add_settings_error(
                 'simple_email_service',
                 'ses_test_error',
-                __('Failed to send test email. Check error logs.', self::TEXT_DOMAIN),
+                __('Failed to send test email. Check error logs.', 'simple-email-service'),
                 'error'
             );
         }
@@ -284,7 +395,7 @@ class Simple_Email_Service
      * @param array $args Positional arguments
      * @param array $assoc_args Associative arguments
      */
-    public function wp_cli_test_email($args, $assoc_args)
+    public function wpCliTestEmail($args, $assoc_args)
     {
         $to = WP_CLI\Utils\get_flag_value($assoc_args, 'to', get_option('admin_email'));
 
@@ -302,10 +413,10 @@ class Simple_Email_Service
         }
     }
 
-    private function is_from_email_domain_valid($from_email): bool
+    private function isFromEmailDomainValid($from_email): bool
     {
         $site_url = get_site_url();
-        $site_domain = preg_replace('/^www\./', '', parse_url($site_url, PHP_URL_HOST));
+        $site_domain = preg_replace('/^www\./', '', wp_parse_url($site_url, PHP_URL_HOST));
         $from_domain = substr(strrchr($from_email, '@'), 1);
         $from_domain = preg_replace('/^www\./', '', $from_domain);
         $from_domain = strtolower($from_domain);
@@ -313,12 +424,14 @@ class Simple_Email_Service
         return $from_domain === $site_domain;
     }
 
-    private function add_plugin_action_links_filter(): void
+    private function addPluginActionLinksFilter(): void
     {
         add_filter(
             'plugin_action_links_' . $this->plugin_basename,
             function ($links) {
-                $settings_link = '<a href="options-general.php?page=simple-email-service">' . __('Settings', self::TEXT_DOMAIN) . '</a>';
+                $settings_link = '<a href="options-general.php?page=simple-email-service">'
+                    . __('Settings', 'simple-email-service')
+                    . '</a>';
                 array_unshift($links, $settings_link);
                 return $links;
             }
