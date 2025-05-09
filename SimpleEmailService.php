@@ -136,29 +136,30 @@ class SimpleEmailService
             ]
         ];
 
-        $options = [
-            'http' => [
-                'header' => [
-                    'Content-type: application/json',
-                    'X-Api-Key: ' . $this->api_key
-                ],
-                'method' => 'POST',
-                'content' => json_encode($email)
-            ]
-        ];
-
         try {
-            $context = stream_context_create($options);
-            $response = file_get_contents(
-                $this->api_url,
-                false,
-                $context
-            );
+            $response = wp_remote_post($this->api_url, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'X-Api-Key' => $this->api_key
+                ],
+                'body' => json_encode($email)
+            ]);
 
-            if ($response === false) {
+            if (is_wp_error($response)) {
                 $error = new WP_Error(
                     'ses_send_failed',
                     __('Simple Email Service: Failed to send email', 'simple-email-service')
+                );
+                do_action('wp_mail_failed', $error);
+                return false;
+            }
+
+            // Check for domain not registered error
+            $body = json_decode(wp_remote_retrieve_body($response), true);
+            if (isset($body['status']) && $body['status'] === 'domain is not registered') {
+                $error = new WP_Error(
+                    'ses_domain_not_registered',
+                    __('Simple Email Service: Domain is not registered', 'simple-email-service')
                 );
                 do_action('wp_mail_failed', $error);
                 return false;

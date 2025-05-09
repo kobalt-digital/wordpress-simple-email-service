@@ -1,6 +1,14 @@
 # Simple Email Service
 Send WordPress emails through the [Simple Email Service API](https://api.simplemailservice.eu/). This plugin integrates with the [Simple Email Service](https://hosting.nl/products/simple-email-service/) by hosting.nl, a Dutch email service provider that offers a scalable, privacy-friendly solution for sending transactional emails. The service supports both SMTP and REST API, ensuring reliable and efficient email delivery.
 
+Requires at least: 4.7
+Tested up to: 6.8
+Stable tag: 1.0.0
+Requires PHP: 7.4
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Send WordPress emails through the Simple Email Service API by hosting.nl
+
 ## Features
 
 - Seamlessly routes all WordPress emails through the Simple Email Service API.

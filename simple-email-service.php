@@ -4,6 +4,7 @@
  * Plugin URI: https://kobaltdigital.nl/simple-email-service
  * Description: Send WordPress emails through the Simple Email Service API
  * Version: 1.0.0
+ * Tested up to: 6.8
  * Author: Arne van Hoorn - Kobalt Digital
  * Author URI: https://kobaltdigital.nl
  * License: GPLv2 or later
