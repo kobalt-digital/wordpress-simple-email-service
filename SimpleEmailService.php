@@ -2,12 +2,30 @@
 
 declare(strict_types=1);
 
+/**
+ * Simple Email Service Class
+ *
+ * This class integrates with the Simple Email Service API to send emails from WordPress.
+ * It provides methods for configuring the service, sending emails, and handling errors.
+ *
+ * @package Simple_Email_Service
+ * @author Arne van Hoorn - Kobalt Digital
+ * @license GPL v2 or later
+ * @link https://kobaltdigital.nl
+ */
 class SimpleEmailService
 {
     private string $api_key;
     private string $api_url = 'https://api.simplemailservice.eu/v1/email/send';
     private string $plugin_basename;
 
+    /**
+     * Constructor for the Simple Email Service class.
+     *
+     * Initializes the API key and plugin basename, and sets up WordPress hooks for email handling.
+     *
+     * @param string|null $pluginFile The plugin file path.
+     */
     public function __construct($pluginFile = null)
     {
         if (!defined('ABSPATH')) {
@@ -37,6 +55,11 @@ class SimpleEmailService
         }
     }
 
+    /**
+     * Disables the default PHPMailer settings.
+     *
+     * @param PHPMailer $phpmailer The PHPMailer instance.
+     */
     public function disablePhpmailer($phpmailer)
     {
         $phpmailer->Mailer = 'smtp';
@@ -45,6 +68,13 @@ class SimpleEmailService
         $phpmailer->Port = 1025;
     }
 
+    /**
+     * Sends an email using the Simple Email Service API.
+     *
+     * @param bool $pre_wp_mail Whether to preempt the wp_mail function.
+     * @param array $atts Email attributes.
+     * @return bool Whether the email was sent successfully.
+     */
     public function sendEmail($pre_wp_mail, $atts)
     {
         if (empty($this->api_key)) {
@@ -149,6 +179,11 @@ class SimpleEmailService
         }
     }
 
+    /**
+     * Handles failed email attempts.
+     *
+     * @param WP_Error $error The error object.
+     */
     public function handleWpMailFailed($error)
     {
         $errorMessage = sprintf(
@@ -163,6 +198,9 @@ class SimpleEmailService
         }
     }
 
+    /**
+     * Adds the Simple Email Service settings page to the WordPress admin menu.
+     */
     public function addAdminMenu()
     {
         add_options_page(
@@ -174,6 +212,9 @@ class SimpleEmailService
         );
     }
 
+    /**
+     * Registers the settings for the Simple Email Service.
+     */
     public function registerSettings()
     {
         register_setting(
@@ -194,10 +235,10 @@ class SimpleEmailService
     }
 
     /**
-     * Sanitize API key
+     * Sanitizes the API key.
      *
-     * @param string $value The API key to sanitize
-     * @return string Sanitized API key
+     * @param string $value The API key to sanitize.
+     * @return string Sanitized API key.
      */
     public function sanitizeApiKey($value): string
     {
@@ -205,10 +246,10 @@ class SimpleEmailService
     }
 
     /**
-     * Sanitize email address
+     * Sanitizes the email address.
      *
-     * @param string $value The email address to sanitize
-     * @return string Sanitized email address
+     * @param string $value The email address to sanitize.
+     * @return string Sanitized email address.
      */
     public function sanitizeEmail($value): string
     {
@@ -225,16 +266,19 @@ class SimpleEmailService
     }
 
     /**
-     * Sanitize text input
+     * Sanitizes the text input.
      *
-     * @param string $value The text to sanitize
-     * @return string Sanitized text
+     * @param string $value The text to sanitize.
+     * @return string Sanitized text.
      */
     public function sanitizeText($value): string
     {
         return sanitize_text_field($value);
     }
 
+    /**
+     * Renders the settings page for the Simple Email Service.
+     */
     public function renderSettingsPage()
     {
         if (isset($_POST['ses_test_email'])) {
@@ -349,6 +393,9 @@ class SimpleEmailService
         <?php
     }
 
+    /**
+     * Sends a test email to verify the configuration.
+     */
     private function sendTestEmail()
     {
         // Verify nonce
@@ -389,10 +436,10 @@ class SimpleEmailService
     }
 
     /**
-     * WP-CLI command to send a test email
+     * WP-CLI command to send a test email.
      *
-     * @param array $args Positional arguments
-     * @param array $assoc_args Associative arguments
+     * @param array $args Command arguments.
+     * @param array $assoc_args Command associative arguments.
      */
     public function wpCliTestEmail($args, $assoc_args)
     {
@@ -412,26 +459,35 @@ class SimpleEmailService
         }
     }
 
+    /**
+     * Checks if the from email domain is valid.
+     *
+     * @param string $fromEmail The from email address.
+     * @return bool Whether the domain is valid.
+     */
     private function isFromEmailDomainValid($fromEmail): bool
     {
-        $site_url = get_site_url();
-        $site_domain = preg_replace('/^www\./', '', wp_parse_url($site_url, PHP_URL_HOST));
-        $from_domain = substr(strrchr($fromEmail, '@'), 1);
-        $from_domain = preg_replace('/^www\./', '', $from_domain);
-        $from_domain = strtolower($from_domain);
-        $site_domain = strtolower($site_domain);
-        return $from_domain === $site_domain;
+        $siteUrl = get_site_url();
+        $siteDomain = preg_replace('/^www\./', '', wp_parse_url($siteUrl, PHP_URL_HOST));
+        $fromDomain = substr(strrchr($fromEmail, '@'), 1);
+        $fromDomain = preg_replace('/^www\./', '', $fromDomain);
+        $fromDomain = strtolower($fromDomain);
+        $siteDomain = strtolower($siteDomain);
+        return $fromDomain === $siteDomain;
     }
 
+    /**
+     * Adds a filter for plugin action links.
+     */
     private function addPluginActionLinksFilter(): void
     {
         add_filter(
             'plugin_action_links_' . $this->plugin_basename,
             function ($links) {
-                $settings_link = '<a href="options-general.php?page=simple-email-service">'
+                $settingsLink = '<a href="options-general.php?page=simple-email-service">'
                     . __('Settings', 'simple-email-service')
                     . '</a>';
-                array_unshift($links, $settings_link);
+                array_unshift($links, $settingsLink);
                 return $links;
             }
         );

@@ -9,7 +9,7 @@
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: simple-email-service
- * Send WordPress emails through the Simple Email Service API by Hosting.NL
+ * Send WordPress emails through the Simple Email Service API by hosting.nl
  */
 
 declare(strict_types=1);

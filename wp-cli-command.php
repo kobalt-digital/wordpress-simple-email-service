@@ -1,10 +1,25 @@
 <?php
+
 /**
- * Add this to your plugin to enable WP-CLI testing
+ * WP-CLI Command for Simple Email Service
+ *
+ * This file adds a WP-CLI command to send test emails using the Simple Email Service.
+ * It allows users to verify their email configuration directly from the command line.
+ *
+ * @package Simple_Email_Service
+ * @author Arne van Hoorn - Kobalt Digital
+ * @license GPL v2 or later
+ * @link https://kobaltdigital.nl
  */
 
 if (defined('WP_CLI') && WP_CLI) {
-    WP_CLI::add_command('ses test', function($args, $assoc_args) {
+    /**
+     * Registers a WP-CLI command to send a test email.
+     *
+     * @param array $args Command arguments.
+     * @param array $assoc_args Command associative arguments.
+     */
+    WP_CLI::add_command('ses test', function ($args, $assoc_args) {
         $to = WP_CLI::get_flag_value($assoc_args, 'to', get_option('admin_email'));
 
         $result = wp_mail(
