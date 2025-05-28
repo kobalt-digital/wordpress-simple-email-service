@@ -15,5 +15,5 @@ jobs:
 
     - name: Run plugin check
       uses: wordpress/plugin-check-action@v1
-      with: 
-        slug: 'simple-email-service'
+      with:
+        slug: 'simple-email-service-by-hosting-nl'

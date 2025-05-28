@@ -1,15 +1,17 @@
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Simple Email Service 1.0.0\n"
+"Project-Id-Version: Simple Email Service\n"
 "Report-Msgid-Bugs-To: https://kobaltdigital.nl\n"
-"POT-Creation-Date: 2024-06-07 00:00+0000\n"
+"POT-Creation-Date: 2025-05-28 09:49+0200\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Kobalt Digital <info@kobaltdigital.nl>\n"
+"Language-Team: Kobalt Digital <info@kobaltdigital.nl>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: AI Cursor\n"
-"Language-Team: Kobalt Digital <info@kobaltdigital.nl>\n"
-"Last-Translator: Kobalt Digital <info@kobaltdigital.nl>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.6\n"
 
 #: simple-email-service.php:... (add line numbers as needed)
 msgid "Send Test Email"

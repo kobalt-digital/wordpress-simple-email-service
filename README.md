@@ -20,7 +20,7 @@ Send WordPress emails through the Simple Email Service API by hosting.nl
 
 ## Installation
 
-1. Upload the plugin files to the `/wp-content/plugins/simple-email-service` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/simple-email-service-by-hosting-nl` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
 3. Go to **Settings > Simple Email Service** to configure the plugin.
 
@@ -50,7 +50,7 @@ If the `--to` flag is omitted, the admin email will be used.
 ## Internationalization
 
 - Translation template is available in `languages/simple-email-service.pot`.
-- Text domain: `simple-email-service`.
+- Text domain: `simple-email-service-by-hosting-nl`.
 
 ## Troubleshooting
 
