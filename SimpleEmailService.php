@@ -312,7 +312,7 @@ class SimpleEmailService
                         <?php
                             esc_html_e(
                                 'No mails can be sent if the domain of the "From Email Address" is different from the site domain.',
-                                'simple-email-service'
+                                'simple-email-service-by-hosting-nl'
                             );
                         ?>
                     </p>
