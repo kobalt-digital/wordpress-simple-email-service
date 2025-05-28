@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Simple Email Service
+ * Plugin Name: Simple Email Service by hosting.nl
  * Plugin URI: https://kobaltdigital.nl/simple-email-service
  * Description: Send WordPress emails through the Simple Email Service API
  * Version: 1.0.0
