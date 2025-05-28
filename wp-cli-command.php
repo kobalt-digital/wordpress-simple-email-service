@@ -12,6 +12,10 @@
  * @link https://kobaltdigital.nl
  */
 
+ if (!defined('ABSPATH')) {
+    exit;
+}
+
 if (defined('WP_CLI') && WP_CLI) {
     /**
      * Registers a WP-CLI command to send a test email.
