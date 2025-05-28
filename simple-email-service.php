@@ -9,7 +9,7 @@
  * Author URI: https://kobaltdigital.nl
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: simple-email-service
+ * Text Domain: simple-email-service-by-hosting-nl
  * Send WordPress emails through the Simple Email Service API by hosting.nl
  */
 

@@ -148,7 +148,7 @@ class SimpleEmailService
             if (is_wp_error($response)) {
                 $error = new WP_Error(
                     'ses_send_failed',
-                    __('Simple Email Service: Failed to send email', 'simple-email-service')
+                    __('Simple Email Service: Failed to send email', 'simple-email-service-by-hosting-nl')
                 );
                 do_action('wp_mail_failed', $error);
                 return false;
@@ -159,7 +159,7 @@ class SimpleEmailService
             if (isset($body['status']) && $body['status'] === 'domain is not registered') {
                 $error = new WP_Error(
                     'ses_domain_not_registered',
-                    __('Simple Email Service: Domain is not registered', 'simple-email-service')
+                    __('Simple Email Service: Domain is not registered', 'simple-email-service-by-hosting-nl')
                 );
                 do_action('wp_mail_failed', $error);
                 return false;
@@ -171,7 +171,7 @@ class SimpleEmailService
                 'ses_exception',
                 sprintf(
                     /* translators: %s: Error message from the Simple Email Service API */
-                    __('Simple Email Service: %s', 'simple-email-service'),
+                    __('Simple Email Service: %s', 'simple-email-service-by-hosting-nl'),
                     $e->getMessage()
                 )
             );
@@ -189,7 +189,7 @@ class SimpleEmailService
     {
         $errorMessage = sprintf(
             /* translators: %s: Error message from WordPress mail function */
-            __('Simple Email Service: Mail error: %s', 'simple-email-service'),
+            __('Simple Email Service: Mail error: %s', 'simple-email-service-by-hosting-nl'),
             $error->get_error_message()
         );
 
@@ -205,8 +205,8 @@ class SimpleEmailService
     public function addAdminMenu()
     {
         add_options_page(
-            __('Simple Email Service Settings', 'simple-email-service'),
-            __('Simple Email Service', 'simple-email-service'),
+            __('Simple Email Service Settings', 'simple-email-service-by-hosting-nl'),
+            __('Simple Email Service', 'simple-email-service-by-hosting-nl'),
             'manage_options',
             'simple-email-service',
             [$this, 'renderSettingsPage']
@@ -259,7 +259,7 @@ class SimpleEmailService
             add_settings_error(
                 'ses_from_email',
                 'invalid_email',
-                __('Please enter a valid email address.', 'simple-email-service')
+                __('Please enter a valid email address.', 'simple-email-service-by-hosting-nl')
             );
             return get_option('ses_from_email', get_option('admin_email'));
         }
@@ -286,7 +286,7 @@ class SimpleEmailService
             // Verify nonce
             $nonce = isset($_POST['ses_test_email_nonce']) ? sanitize_key($_POST['ses_test_email_nonce']) : '';
             if (!wp_verify_nonce($nonce, 'ses_test_email')) {
-                wp_die(esc_html__('Security check failed', 'simple-email-service'));
+                wp_die(esc_html__('Security check failed', 'simple-email-service-by-hosting-nl'));
             }
 
             $this->sendTestEmail();
@@ -322,12 +322,12 @@ class SimpleEmailService
             <!-- Test Email Form -->
             <form method="post" action="">
                 <?php wp_nonce_field('ses_test_email', 'ses_test_email_nonce'); ?>
-                <h2><?php esc_html_e('Send Test Email', 'simple-email-service'); ?></h2>
+                <h2><?php esc_html_e('Send Test Email', 'simple-email-service-by-hosting-nl'); ?></h2>
                 <table class="form-table">
                     <tr>
                         <th scope="row">
                             <label for="test_email">
-                                <?php esc_html_e('Test Email Address', 'simple-email-service'); ?>
+                                <?php esc_html_e('Test Email Address', 'simple-email-service-by-hosting-nl'); ?>
                             </label>
                         </th>
                         <td>
@@ -351,7 +351,7 @@ class SimpleEmailService
                 <table class="form-table">
                     <tr>
                         <th scope="row">
-                            <label for="ses_api_key"><?php esc_html_e('API Key', 'simple-email-service'); ?></label>
+                            <label for="ses_api_key"><?php esc_html_e('API Key', 'simple-email-service-by-hosting-nl'); ?></label>
                         </th>
                         <td>
                             <input type="text"
@@ -364,7 +364,7 @@ class SimpleEmailService
                     <tr>
                         <th scope="row">
                             <label for="ses_from_email">
-                                <?php esc_html_e('From Email Address', 'simple-email-service'); ?>
+                                <?php esc_html_e('From Email Address', 'simple-email-service-by-hosting-nl'); ?>
                             </label>
                         </th>
                         <td>
@@ -377,7 +377,7 @@ class SimpleEmailService
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="ses_from_name"><?php esc_html_e('From Name', 'simple-email-service'); ?></label>
+                            <label for="ses_from_name"><?php esc_html_e('From Name', 'simple-email-service-by-hosting-nl'); ?></label>
                         </th>
                         <td>
                             <input type="text"
@@ -404,7 +404,7 @@ class SimpleEmailService
             !isset($_POST['ses_test_email_nonce'])
             || !wp_verify_nonce(sanitize_key($_POST['ses_test_email_nonce']), 'ses_test_email')
             ) {
-            wp_die(esc_html__('Security check failed', 'simple-email-service'));
+            wp_die(esc_html__('Security check failed', 'simple-email-service-by-hosting-nl'));
         }
 
         $test_email = isset($_POST['test_email'])
@@ -423,14 +423,14 @@ class SimpleEmailService
             add_settings_error(
                 'simple_email_service',
                 'ses_test_success',
-                __('Test email sent successfully! Check your inbox.', 'simple-email-service'),
+                __('Test email sent successfully! Check your inbox.', 'simple-email-service-by-hosting-nl'),
                 'success'
             );
         } else {
             add_settings_error(
                 'simple_email_service',
                 'ses_test_error',
-                __('Failed to send test email. Check error logs.', 'simple-email-service'),
+                __('Failed to send test email. Check error logs.', 'simple-email-service-by-hosting-nl'),
                 'error'
             );
         }
@@ -486,7 +486,7 @@ class SimpleEmailService
             'plugin_action_links_' . $this->plugin_basename,
             function ($links) {
                 $settingsLink = '<a href="options-general.php?page=simple-email-service">'
-                    . __('Settings', 'simple-email-service')
+                    . __('Settings', 'simple-email-service-by-hosting-nl')
                     . '</a>';
                 array_unshift($links, $settingsLink);
                 return $links;
