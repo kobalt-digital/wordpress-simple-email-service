@@ -9,6 +9,22 @@ License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Send WordPress emails through the Simple Email Service API by hosting.nl
 
+## External Services
+
+This plugin integrates with the Simple Email Service API provided by hosting.nl to send emails from your WordPress site. This integration is essential for the plugin's core functionality of sending emails.
+
+### What data is sent and when
+- Email content (subject, body, recipient information) is sent to the Simple Email Service API whenever WordPress needs to send an email
+- Sender email address and name (as configured in the plugin settings)
+- API key for authentication
+- No personal data beyond what is necessary for sending the email is transmitted
+
+### Service Provider Information
+- Service Provider: hosting.nl
+- Service Name: Simple Email Service
+- [Terms of Service](https://hosting.nl/en/general-terms-and-conditions-hosting-nl/)
+- [Privacy Policy](https://hosting.nl/en/privacy-policy/)
+
 ## Features
 
 - Seamlessly routes all WordPress emails through the Simple Email Service API.
