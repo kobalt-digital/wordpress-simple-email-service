@@ -45,6 +45,7 @@ class SimpleEmailService
         // Admin hooks
         add_action('admin_menu', [$this, 'addAdminMenu']);
         add_action('admin_init', [$this, 'registerSettings']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets']);
 
         // Plugin action links
         $this->addPluginActionLinksFilter();
@@ -297,13 +298,6 @@ class SimpleEmailService
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
-            <style>
-                .regular-text.error {
-                    border-color: #dc3232;
-                    box-shadow: 0 0 2px rgba(220, 50, 50, 0.8);
-                }
-            </style>
-
             <?php settings_errors('simple_email_service'); ?>
 
             <?php if ($show_domain_warning) { ?>
@@ -491,6 +485,26 @@ class SimpleEmailService
                 array_unshift($links, $settingsLink);
                 return $links;
             }
+        );
+    }
+
+    /**
+     * Enqueues admin scripts and styles.
+     *
+     * @param string $hook The current admin page.
+     */
+    public function enqueueAdminAssets($hook): void
+    {
+        // Only load on our settings page
+        if ('settings_page_simple-email-service' !== $hook) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'simple-email-service-admin',
+            plugin_dir_url(__FILE__) . 'css/admin.css',
+            [],
+            filemtime(plugin_dir_path(__FILE__) . 'css/admin.css')
         );
     }
 }
