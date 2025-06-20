@@ -13,7 +13,7 @@ declare(strict_types=1);
  * @license GPL v2 or later
  * @link https://kobaltdigital.nl
  */
-class SimpleEmailService
+class SimpleEmailServiceByHostingNL
 {
     private string $api_key;
     private string $api_url = 'https://api.simplemailservice.eu/v1/email/send';
@@ -32,7 +32,7 @@ class SimpleEmailService
             exit;
         }
 
-        $this->api_key = get_option('ses_api_key', '');
+        $this->api_key = get_option('ses_by_hosting_nl_api_key', '');
         $this->plugin_basename = $pluginFile
             ? plugin_basename($pluginFile)
             : plugin_basename(__FILE__);
@@ -88,8 +88,8 @@ class SimpleEmailService
         $headers = $atts['headers'];
 
         // Parse headers
-        $fromEmail = get_option('ses_from_email', get_option('admin_email'));
-        $fromName = get_option('ses_from_name', get_bloginfo('name'));
+        $fromEmail = get_option('ses_by_hosting_nl_from_email', get_option('admin_email'));
+        $fromName = get_option('ses_by_hosting_nl_from_name', get_bloginfo('name'));
 
         if (!empty($headers) && is_string($headers)) {
             $headers = explode("\n", str_replace("\r\n", "\n", $headers));
@@ -148,7 +148,7 @@ class SimpleEmailService
 
             if (is_wp_error($response)) {
                 $error = new WP_Error(
-                    'ses_send_failed',
+                    'ses_by_hosting_nl_send_failed',
                     __('Simple Email Service: Failed to send email', 'simple-email-service-by-hosting-nl')
                 );
                 do_action('wp_mail_failed', $error);
@@ -159,7 +159,7 @@ class SimpleEmailService
             $body = json_decode(wp_remote_retrieve_body($response), true);
             if (isset($body['status']) && $body['status'] === 'domain is not registered') {
                 $error = new WP_Error(
-                    'ses_domain_not_registered',
+                    'ses_by_hosting_nl_domain_not_registered',
                     __('Simple Email Service: Domain is not registered', 'simple-email-service-by-hosting-nl')
                 );
                 do_action('wp_mail_failed', $error);
@@ -169,7 +169,7 @@ class SimpleEmailService
             return true;
         } catch (Exception $e) {
             $error = new WP_Error(
-                'ses_exception',
+                'ses_by_hosting_nl_exception',
                 sprintf(
                     /* translators: %s: Error message from the Simple Email Service API */
                     __('Simple Email Service: %s', 'simple-email-service-by-hosting-nl'),
@@ -221,17 +221,17 @@ class SimpleEmailService
     {
         register_setting(
             'simple_email_service',
-            'ses_api_key',
+            'ses_by_hosting_nl_api_key',
             [$this, 'sanitizeApiKey']
         );
         register_setting(
             'simple_email_service',
-            'ses_from_email',
+            'ses_by_hosting_nl_from_email',
             [$this, 'sanitizeEmail']
         );
         register_setting(
             'simple_email_service',
-            'ses_from_name',
+            'ses_by_hosting_nl_from_name',
             [$this, 'sanitizeText']
         );
     }
@@ -258,11 +258,11 @@ class SimpleEmailService
         $sanitized = sanitize_email($value);
         if (!is_email($sanitized)) {
             add_settings_error(
-                'ses_from_email',
+                'ses_by_hosting_nl_from_email',
                 'invalid_email',
                 __('Please enter a valid email address.', 'simple-email-service-by-hosting-nl')
             );
-            return get_option('ses_from_email', get_option('admin_email'));
+            return get_option('ses_by_hosting_nl_from_email', get_option('admin_email'));
         }
         return $sanitized;
     }
@@ -283,16 +283,16 @@ class SimpleEmailService
      */
     public function renderSettingsPage()
     {
-        if (isset($_POST['ses_test_email'])) {
+        if (isset($_POST['ses_by_hosting_nl_test_email'])) {
             // Verify nonce
-            $nonce = isset($_POST['ses_test_email_nonce']) ? sanitize_key($_POST['ses_test_email_nonce']) : '';
-            if (!wp_verify_nonce($nonce, 'ses_test_email')) {
+            $nonce = isset($_POST['ses_by_hosting_nl_test_email_nonce']) ? sanitize_key($_POST['ses_by_hosting_nl_test_email_nonce']) : '';
+            if (!wp_verify_nonce($nonce, 'ses_by_hosting_nl_test_email')) {
                 wp_die(esc_html__('Security check failed', 'simple-email-service-by-hosting-nl'));
             }
 
             $this->sendTestEmail();
         }
-        $fromEmail = get_option('ses_from_email', get_option('admin_email'));
+        $fromEmail = get_option('ses_by_hosting_nl_from_email', get_option('admin_email'));
         $show_domain_warning = !$this->isFromEmailDomainValid($fromEmail);
         ?>
         <div class="wrap">
@@ -315,7 +315,7 @@ class SimpleEmailService
 
             <!-- Test Email Form -->
             <form method="post" action="">
-                <?php wp_nonce_field('ses_test_email', 'ses_test_email_nonce'); ?>
+                <?php wp_nonce_field('ses_by_hosting_nl_test_email', 'ses_by_hosting_nl_test_email_nonce'); ?>
                 <h2><?php esc_html_e('Send Test Email', 'simple-email-service-by-hosting-nl'); ?></h2>
                 <table class="form-table">
                     <tr>
@@ -333,7 +333,7 @@ class SimpleEmailService
                         </td>
                     </tr>
                 </table>
-                <?php submit_button('Send Test Email', 'secondary', 'ses_test_email'); ?>
+                <?php submit_button('Send Test Email', 'secondary', 'ses_by_hosting_nl_test_email'); ?>
             </form>
 
             <!-- Settings Form -->
@@ -345,39 +345,39 @@ class SimpleEmailService
                 <table class="form-table">
                     <tr>
                         <th scope="row">
-                            <label for="ses_api_key"><?php esc_html_e('API Key', 'simple-email-service-by-hosting-nl'); ?></label>
+                            <label for="ses_by_hosting_nl_api_key"><?php esc_html_e('API Key', 'simple-email-service-by-hosting-nl'); ?></label>
                         </th>
                         <td>
                             <input type="text"
-                                   id="ses_api_key"
-                                   name="ses_api_key"
-                                   value="<?php echo esc_attr(get_option('ses_api_key')); ?>"
+                                   id="ses_by_hosting_nl_api_key"
+                                   name="ses_by_hosting_nl_api_key"
+                                   value="<?php echo esc_attr(get_option('ses_by_hosting_nl_api_key')); ?>"
                                    class="regular-text">
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="ses_from_email">
+                            <label for="ses_by_hosting_nl_from_email">
                                 <?php esc_html_e('From Email Address', 'simple-email-service-by-hosting-nl'); ?>
                             </label>
                         </th>
                         <td>
                             <input type="email"
-                                   id="ses_from_email"
-                                   name="ses_from_email"
-                                   value="<?php echo esc_attr(get_option('ses_from_email', get_option('admin_email'))); ?>"
+                                   id="ses_by_hosting_nl_from_email"
+                                   name="ses_by_hosting_nl_from_email"
+                                   value="<?php echo esc_attr(get_option('ses_by_hosting_nl_from_email', get_option('admin_email'))); ?>"
                                    class="regular-text <?php echo $show_domain_warning ? 'error' : ''; ?>">
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="ses_from_name"><?php esc_html_e('From Name', 'simple-email-service-by-hosting-nl'); ?></label>
+                            <label for="ses_by_hosting_nl_from_name"><?php esc_html_e('From Name', 'simple-email-service-by-hosting-nl'); ?></label>
                         </th>
                         <td>
                             <input type="text"
-                                   id="ses_from_name"
-                                   name="ses_from_name"
-                                   value="<?php echo esc_attr(get_option('ses_from_name', get_bloginfo('name'))); ?>"
+                                   id="ses_by_hosting_nl_from_name"
+                                   name="ses_by_hosting_nl_from_name"
+                                   value="<?php echo esc_attr(get_option('ses_by_hosting_nl_from_name', get_bloginfo('name'))); ?>"
                                    class="regular-text">
                         </td>
                     </tr>
@@ -395,8 +395,8 @@ class SimpleEmailService
     {
         // Verify nonce
         if (
-            !isset($_POST['ses_test_email_nonce'])
-            || !wp_verify_nonce(sanitize_key($_POST['ses_test_email_nonce']), 'ses_test_email')
+            !isset($_POST['ses_by_hosting_nl_test_email_nonce'])
+            || !wp_verify_nonce(sanitize_key($_POST['ses_by_hosting_nl_test_email_nonce']), 'ses_by_hosting_nl_test_email')
             ) {
             wp_die(esc_html__('Security check failed', 'simple-email-service-by-hosting-nl'));
         }
@@ -416,14 +416,14 @@ class SimpleEmailService
         if ($result) {
             add_settings_error(
                 'simple_email_service',
-                'ses_test_success',
+                'ses_by_hosting_nl_test_success',
                 __('Test email sent successfully! Check your inbox.', 'simple-email-service-by-hosting-nl'),
                 'success'
             );
         } else {
             add_settings_error(
                 'simple_email_service',
-                'ses_test_error',
+                'ses_by_hosting_nl_test_error',
                 __('Failed to send test email. Check error logs.', 'simple-email-service-by-hosting-nl'),
                 'error'
             );

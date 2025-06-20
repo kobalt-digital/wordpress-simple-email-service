@@ -3,8 +3,10 @@
  * Plugin Name: Simple Email Service by hosting.nl
  * Plugin URI: https://kobaltdigital.nl/simple-email-service
  * Description: Send WordPress emails through the Simple Email Service API
- * Version: 1.0.5
+ * Version: 1.0.6
  * Tested up to: 6.8
+ * Requires at least: 4.7
+ * Requires PHP: 7.4
  * Author: Arne van Hoorn - Kobalt Digital
  * Author URI: https://kobaltdigital.nl
  * License: GPLv2 or later
@@ -21,4 +23,4 @@ if (!defined('ABSPATH')) {
 
 require_once __DIR__ . '/SimpleEmailService.php';
 
-new SimpleEmailService(__FILE__);
+new SimpleEmailServiceByHostingNL(__FILE__);
