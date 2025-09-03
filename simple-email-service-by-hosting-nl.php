@@ -23,4 +23,8 @@ if (!defined('ABSPATH')) {
 
 require_once __DIR__ . '/SimpleEmailService.php';
 
-new SimpleEmailServiceByHostingNL(__FILE__);
+// Initialize the plugin
+$simple_email_service = new SimpleEmailServiceByHostingNL(__FILE__);
+
+// Register deactivation hook to clean up scheduled tasks
+register_deactivation_hook(__FILE__, [SimpleEmailServiceByHostingNL::class, 'cleanupScheduledTasks']);
